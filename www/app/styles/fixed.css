@@ -1,0 +1,24 @@
+﻿
+/*!
+This file is part of DecSoft App Builder.
+Visit our website for license information.
+Copyright ©2025 DecSoft. All rights reserved.
+Visit our website at: https://www.decsoftutils.com/
+
+*/
+
+html, body, .app-view { width: 320px; height: 480px; }
+.app-dialog .modal-dialog { margin: auto; width: 320px; height: 480px; }
+.app-dialog .modal-dialog .modal-content { width: 320px; height: 480px; }
+
+#viewUnlock #htmlUnlock { position: absolute; top: 0px; left: 8px; width: 304px; height: 480px; }
+
+#viewMMsgsList #messagesList { position: absolute; top: 32px; left: 8px; width: 304px; height: 408px; }
+
+#viewMMsgsList #htmlComposeBar { position: absolute; top: 440px; left: 0px; width: 320px; height: 40px; }
+
+#viewMMsgsList #htmlToolbar { position: absolute; top: 0px; left: 0px; width: 320px; height: 32px; }
+
+#viewSettings #settingsList { position: absolute; top: 32px; left: 8px; width: 304px; height: 448px; }
+
+#viewSettings #htmlToolbarSettings { position: absolute; top: 0px; left: 0px; width: 320px; height: 32px; }

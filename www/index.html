@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="" dir="" data-bs-theme="light">
+ <head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+   <meta http-equiv="Content-Security-Policy"
+    content="default-src * app: file: data: mediastream: blob: filesystem: cdvfile: ws: ms-appdata: ms-appx-web: gap: 'unsafe-inline' 'unsafe-eval';"><meta name="generator" content="DecSoft App Builder 2025.8 - https://www.decsoftutils.com/">
+   <meta name="description" content="Messages - Mpesify Mpesa Messages">
+   <meta name="author" content="Murage Kabui - contact@denniskabui.com - https://www.denniskabui.com/">
+  <link rel="apple-touch-icon" href="app/images/icon.png">
+  <link rel="icon" type="image/png" href="app/images/icon.png">
+  <link rel="shortcut icon" href="app/images/icon.png" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" id="app-theme" href="app/styles/default.css">
+  <link rel="stylesheet" type="text/css" id="app-style" href="app/styles/scaled.css">
+  <link rel="stylesheet" type="text/css" href="app/styles/shared.css">
+  <link rel="stylesheet" type="text/css" href="app/styles/pluginscomps.css"><link rel="stylesheet" type="text/css" href="app/styles/styles.css">
+<link rel="stylesheet" type="text/css" href="app/styles/toolbar.css">
+<link rel="stylesheet" type="text/css" href="app/styles/messages.css">
+<link rel="stylesheet" type="text/css" href="app/styles/linkPreview.css">
+<link rel="stylesheet" type="text/css" href="app/styles/composebar.css">
+<link rel="stylesheet" type="text/css" href="app/styles/toast.css">
+<link rel="stylesheet" type="text/css" href="app/styles/gmessage.css">
+<link rel="stylesheet" type="text/css" href="app/styles/settings.css">
+<link rel="stylesheet" type="text/css" href="app/styles/lock-screen.css">
+<link rel="stylesheet" type="text/css" href="app/styles/jquery.gcontextmenu.css">
+
+ </head>
+ <body>
+  <div id="app">
+   <router-view v-slot="{Component}">
+    <keep-alive>
+     <component :is="Component"></component>
+    </keep-alive>
+   </router-view>
+   <dab-alert ref="DabAlert"></dab-alert>
+   <dab-toast ref="DabToast"></dab-toast>
+   <div id="dab-sidebar-overlay"></div>
+  </div>
+  <script src="app/scripts/builder.min.js"></script><script src="app/scripts/jquery.gmessage.js"></script>
+<script src="app/scripts/jquery.gcontextmenu.js"></script>
+<script src="app/plugins/DecSoft/Analytics/scripts/ga4mp.umd.min.js"></script>
+
+  <script src="app/scripts/pluginscomps.js"></script>
+  <script src="app/scripts/applangs.js"></script>
+  <script src="app/scripts/app.js"></script>
+  <script src="cordova.js"></script>
+ </body>
+</html>

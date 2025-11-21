@@ -1,0 +1,149 @@
+/* Google Style Context Menu */
+
+/* Selected element highlight */
+.gcontextmenu-selected {
+    background-color: rgba(66, 133, 244, 0.1) !important;
+    position: relative;
+}
+
+.gcontextmenu-selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(66, 133, 244, 0.08);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.gcontextmenu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.gcontextmenu-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gcontextmenu-menu {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
+                0 8px 16px rgba(0, 0, 0, 0.15);
+    min-width: 140px;
+    padding: 4px 0;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gcontextmenu-overlay.show .gcontextmenu-menu {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.gcontextmenu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #202124;
+    font-size: 13px;
+    font-family: 'Google Sans', Roboto, Arial, sans-serif;
+    transition: background-color 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+}
+
+.gcontextmenu-item:hover {
+    background-color: #f1f3f4;
+}
+
+.gcontextmenu-item:active {
+    background-color: #e8eaed;
+}
+
+.gcontextmenu-icon {
+    margin-right: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+}
+
+.gcontextmenu-label {
+    flex: 1;
+    white-space: nowrap;
+}
+
+/* Ripple effect */
+.gcontextmenu-item.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.gcontextmenu-item.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.gcontextmenu-item.ripple:active::after {
+    width: 200px;
+    height: 200px;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .gcontextmenu-selected {
+        background-color: rgba(138, 180, 248, 0.15) !important;
+    }
+
+    .gcontextmenu-selected::before {
+        background-color: rgba(138, 180, 248, 0.1);
+    }
+
+    .gcontextmenu-menu {
+        background: #2d2e30;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4),
+                    0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .gcontextmenu-item {
+        color: #e8eaed;
+    }
+
+    .gcontextmenu-item:hover {
+        background-color: #3c4043;
+    }
+
+    .gcontextmenu-item:active {
+        background-color: #494c50;
+    }
+
+    .gcontextmenu-item.ripple::after {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
