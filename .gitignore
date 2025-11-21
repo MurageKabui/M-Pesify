@@ -1,7 +1,6 @@
 www/app/scripts/
 node_modules/
 platforms/
-plugins/
 cordova_android_debug.bat
 cordova_android_release.bat
 cordova_android_run.bat
