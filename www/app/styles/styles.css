@@ -24,7 +24,6 @@ body {
     background: #202125;
     overflow: hidden;
     height: 100vh;
-    user-select: none;
 }
 
 .status-bar {
@@ -59,7 +58,7 @@ body {
     position: relative;
 }
 
-#htmlComposeBar {
+#htmlComposeBar * {
     user-select: none;
 }
 /* Dark Mode */

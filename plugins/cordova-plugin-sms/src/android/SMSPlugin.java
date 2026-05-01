@@ -86,6 +86,8 @@ extends CordovaPlugin {
     private boolean mIntercept = false;
     private String lastFrom = "";
     private String lastContent = "";
+    private long lastSmsTime = 0;
+    private static final long DEDUP_WINDOW_MS = 2000; // 2 seconds
 
     public boolean execute(String action, JSONArray inputs, CallbackContext callbackContext) throws JSONException {
         PluginResult result = null;
@@ -140,7 +142,7 @@ extends CordovaPlugin {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             digest.update(s.getBytes());
             byte[] messageDigest = digest.digest();
-            StringBuffer hexString = new StringBuffer();
+            StringBuilder hexString = new StringBuilder();
             for (int i = 0; i < messageDigest.length; ++i) {
                 String h = Integer.toHexString(255 & messageDigest[i]);
                 while (h.length() < 2) {
@@ -202,7 +204,8 @@ extends CordovaPlugin {
         if (this.cordova.getActivity().getPackageManager().hasSystemFeature("android.hardware.telephony")) {
             int n;
             if ((n = addressList.length()) > 0) {
-                PendingIntent sentIntent = PendingIntent.getBroadcast((Context)this.cordova.getActivity(), (int)0, (Intent)new Intent("SENDING_SMS"), (int)0);
+                int flags = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0;
+                PendingIntent sentIntent = PendingIntent.getBroadcast((Context)this.cordova.getActivity(), (int)0, (Intent)new Intent("SENDING_SMS"), flags);
                 SmsManager sms = SmsManager.getDefault();
                 for (int i = 0; i < n; ++i) {
                     String address;
@@ -210,7 +213,8 @@ extends CordovaPlugin {
                     sms.sendTextMessage(address, null, text, sentIntent, (PendingIntent)null);
                 }
             } else {
-                PendingIntent sentIntent = PendingIntent.getActivity((Context)this.cordova.getActivity(), (int)0, (Intent)new Intent("android.intent.action.VIEW"), (int)0);
+                int flags = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0;
+                PendingIntent sentIntent = PendingIntent.getActivity((Context)this.cordova.getActivity(), (int)0, (Intent)new Intent("android.intent.action.VIEW"), flags);
                 Intent intent = new Intent("android.intent.action.VIEW");
                 intent.putExtra("sms_body", text);
                 intent.setType("vnd.android-dir/mms-sms");
@@ -230,47 +234,72 @@ extends CordovaPlugin {
 
     private PluginResult listSMS(JSONObject filter, CallbackContext callbackContext) {
         Log.i(LOGTAG, ACTION_LIST_SMS);
-        String uri_filter = filter.has(BOX) ? filter.optString(BOX) : "inbox";
-        int fread = filter.has(READ) ? filter.optInt(READ) : -1;
-        int fid = filter.has("_id") ? filter.optInt("_id") : -1;
-        String faddress = filter.optString(ADDRESS);
-        String fcontent = filter.optString(BODY);
-        int indexFrom = filter.has("indexFrom") ? filter.optInt("indexFrom") : 0;
-        int maxCount = filter.has("maxCount") ? filter.optInt("maxCount") : 10;
-        JSONArray jsons = new JSONArray();
-        Activity ctx = this.cordova.getActivity();
-        Uri uri = Uri.parse((SMS_URI_ALL + uri_filter));
-        Cursor cur = ctx.getContentResolver().query(uri, (String[])null, "", (String[])null, null);
-        int i = 0;
-        while (cur.moveToNext()) {
-            JSONObject json;
-            boolean matchFilter = false;
-            if (fid > -1) {
-                matchFilter = (fid == cur.getInt(cur.getColumnIndex("_id")));
-            } else if (fread > -1) {
-                matchFilter = (fread == cur.getInt(cur.getColumnIndex(READ)));
-            } else if (faddress.length() > 0) {
-                matchFilter = faddress.equals(cur.getString(cur.getColumnIndex(ADDRESS)).trim());
-            } else if (fcontent.length() > 0) {
-                matchFilter = fcontent.equals(cur.getString(cur.getColumnIndex(BODY)).trim());
-            } else {
-                matchFilter = true;
-            }
-            if (! matchFilter) continue;
+        try {
+            String uri_filter = filter.has(BOX) ? filter.optString(BOX) : "inbox";
+            int fread = filter.has(READ) ? filter.optInt(READ) : -1;
+            int fid = filter.has("_id") ? filter.optInt("_id") : -1;
+            String faddress = filter.optString(ADDRESS);
+            String fcontent = filter.optString(BODY);
+            int indexFrom = filter.has("indexFrom") ? filter.optInt("indexFrom") : 0;
+            int maxCount = filter.has("maxCount") ? filter.optInt("maxCount") : 10;
+            JSONArray jsons = new JSONArray();
+            Activity ctx = this.cordova.getActivity();
+            Uri uri = Uri.parse((SMS_URI_ALL + uri_filter));
             
-            if (i < indexFrom) continue;
-            if (i >= indexFrom + maxCount) break;
-            ++i;
-
-            if ((json = this.getJsonFromCursor(cur)) == null) {
-                callbackContext.error("failed to get json from cursor");
-                cur.close();
+            // Use "_id desc" so you fetch the newest messages first (safest standard sorting)
+            // Use null for selection instead of "" to prevent strict SQLite grammar exceptions
+            Cursor cur = ctx.getContentResolver().query(uri, null, null, null, "_id desc");
+            
+            if (cur == null) {
+                callbackContext.error("Failed to query SMS: cursor is null");
                 return null;
             }
-            jsons.put((Object)json);
+            try {
+                int i = 0;
+                while (cur.moveToNext()) {
+                    JSONObject json;
+                    boolean matchFilter = true;
+                    
+                    // Changed from if/else chain to AND conditions so multiple filters work together correctly
+                    if (fid > -1) {
+                        matchFilter = matchFilter && (fid == cur.getInt(cur.getColumnIndexOrThrow("_id")));
+                    }
+                    if (fread > -1) {
+                        matchFilter = matchFilter && (fread == cur.getInt(cur.getColumnIndexOrThrow(READ)));
+                    }
+                    if (faddress.length() > 0) {
+                        String addr = cur.getString(cur.getColumnIndexOrThrow(ADDRESS));
+                        matchFilter = matchFilter && (addr != null && faddress.equals(addr.trim()));
+                    }
+                    if (fcontent.length() > 0) {
+                        String body = cur.getString(cur.getColumnIndexOrThrow(BODY));
+                        matchFilter = matchFilter && (body != null && fcontent.equals(body.trim()));
+                    }
+                    
+                    if (!matchFilter) continue;
+                    
+                    // THE BUG FIX: You must increment i when skipping items for pagination!
+                    if (i < indexFrom) {
+                        ++i;
+                        continue;
+                    }
+                    if (i >= indexFrom + maxCount) break;
+                    ++i;
+
+                    if ((json = this.getJsonFromCursor(cur)) == null) {
+                        callbackContext.error("failed to get json from cursor");
+                        return null;
+                    }
+                    jsons.put((Object)json);
+                }
+                callbackContext.success(jsons);
+            } finally {
+                cur.close();
+            }
+        } catch (Exception e) {
+            Log.e(LOGTAG, "Error in listSMS", e);
+            callbackContext.error("Exception in listSMS: " + e.getMessage());
         }
-        cur.close();
-        callbackContext.success(jsons);
         return null;
     }
 
@@ -323,11 +352,14 @@ extends CordovaPlugin {
     private void onSMSArrive(JSONObject json) {
         String from = json.optString(ADDRESS);
         String content = json.optString(BODY);
-        if (from.equals(this.lastFrom) && content.equals(this.lastContent)) {
+        long now = System.currentTimeMillis();
+        if (from.equals(this.lastFrom) && content.equals(this.lastContent)
+                && (now - this.lastSmsTime) < DEDUP_WINDOW_MS) {
             return;
         }
         this.lastFrom = from;
         this.lastContent = content;
+        this.lastSmsTime = now;
         this.fireEvent("onSMSArrive", json);
     }
 
@@ -337,7 +369,7 @@ extends CordovaPlugin {
 
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                Log.d(LOGTAG, ("onRecieve: " + action));
+                Log.d(LOGTAG, ("onReceive: " + action));
                 if (SMS_RECEIVED.equals(action)) {
                     Bundle bundle;
                     if (SMSPlugin.this.mIntercept) {
@@ -346,8 +378,9 @@ extends CordovaPlugin {
                     if ((bundle = intent.getExtras()) != null) {
                         Object[] pdus;
                         if ((pdus = (Object[])bundle.get("pdus")).length != 0) {
+                            String format = bundle.getString("format");
                             for (int i = 0; i < pdus.length; ++i) {
-                                SmsMessage sms = SmsMessage.createFromPdu((byte[])((byte[])pdus[i]));
+                                SmsMessage sms = SmsMessage.createFromPdu((byte[])((byte[])pdus[i]), format);
                                 JSONObject json = SMSPlugin.this.getJsonFromSmsMessage(sms);
                                 SMSPlugin.this.onSMSArrive(json);
                             }
@@ -356,13 +389,10 @@ extends CordovaPlugin {
                 }
             }
         };
-        String[] filterstr = new String[]{SMS_RECEIVED};
-        for (int i = 0; i < filterstr.length; ++i) {
-            IntentFilter filter = new IntentFilter(filterstr[i]);
-            filter.setPriority(100);
-            ctx.registerReceiver(this.mReceiver, filter);
-            Log.d(LOGTAG, ("broadcast receiver registered for: " + filterstr[i]));
-        }
+        IntentFilter filter = new IntentFilter(SMS_RECEIVED);
+        filter.setPriority(100);
+        ctx.registerReceiver(this.mReceiver, filter);
+        Log.d(LOGTAG, ("broadcast receiver registered for: " + SMS_RECEIVED));
     }
 
     protected void createContentObserver() {
@@ -421,21 +451,29 @@ extends CordovaPlugin {
         int n = 0;
         try {
             Uri uri = Uri.parse((SMS_URI_ALL + uri_filter));
-            Cursor cur = ctx.getContentResolver().query(uri, (String[])null, "", (String[])null, null);
-            while (cur.moveToNext()) {
-                int id = cur.getInt(cur.getColumnIndex("_id"));
-                boolean matchId = fid > -1 && fid == id;
-                int read = cur.getInt(cur.getColumnIndex(READ));
-                boolean matchRead = fread > -1 && fread == read;
-                String address = cur.getString(cur.getColumnIndex(ADDRESS)).trim();
-                boolean matchAddr = faddress.length() > 0 && address.equals(faddress);
-                String body = cur.getString(cur.getColumnIndex(BODY)).trim();
-                boolean matchContent = fcontent.length() > 0 && body.equals(fcontent);
-                if (!matchId && !matchRead && !matchAddr && !matchContent) continue;
-                ctx.getContentResolver().delete(uri, "_id=" + id, (String[])null);
-                ++n;
+            Cursor cur = ctx.getContentResolver().query(uri, null, null, null, null);
+            if (cur == null) {
+                callbackContext.error("Failed to query SMS");
+                return null;
             }
-            callbackContext.success(n);
+            try {
+                while (cur.moveToNext()) {
+                    int id = cur.getInt(cur.getColumnIndexOrThrow("_id"));
+                    boolean matchId = fid > -1 && fid == id;
+                    int read = cur.getInt(cur.getColumnIndexOrThrow(READ));
+                    boolean matchRead = fread > -1 && fread == read;
+                    String address = cur.getString(cur.getColumnIndexOrThrow(ADDRESS)).trim();
+                    boolean matchAddr = faddress.length() > 0 && address.equals(faddress);
+                    String body = cur.getString(cur.getColumnIndexOrThrow(BODY)).trim();
+                    boolean matchContent = fcontent.length() > 0 && body.equals(fcontent);
+                    if (!matchId && !matchRead && !matchAddr && !matchContent) continue;
+                    ctx.getContentResolver().delete(uri, "_id=" + id, (String[])null);
+                    ++n;
+                }
+                callbackContext.success(n);
+            } finally {
+                cur.close();
+            }
         }
         catch (Exception e) {
             callbackContext.error(e.toString());
@@ -458,7 +496,7 @@ extends CordovaPlugin {
         	json.put( SERVICE_CENTER, sms.getServiceCenterAddress());
         	
         } catch ( Exception e ) { 
-            e.printStackTrace(); 
+            Log.e(LOGTAG, "Error building JSON from SmsMessage", e);
         }
 
     	return json;
