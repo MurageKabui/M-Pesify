@@ -1,5 +1,8 @@
-/* Toast Message Component Styles */
+﻿/* Toast Message Component Styles */
 
+.toast-message * {
+    user-select: none;
+}
 .toast-message {
     position: fixed;
     bottom: 16px;
@@ -13,7 +16,6 @@
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-
     z-index: 1000;
     transition: opacity 0.3s ease, transform 0.3s ease;
 

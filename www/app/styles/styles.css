@@ -1,4 +1,4 @@
-/* Base Styles - Google Messages App */
+﻿/* Base Styles - Google Messages App */
 
 @font-face {
     font-family: 'Google Sans';
@@ -15,6 +15,7 @@
     font-family: 'Google Sans';
     font-weight: 400;
     font-style: normal;
+    font-family: 'Google Sans', 'Roboto', sans-serif;
 }
 
 body {
@@ -58,6 +59,9 @@ body {
     position: relative;
 }
 
+#htmlComposeBar {
+    user-select: none;
+}
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
     body {

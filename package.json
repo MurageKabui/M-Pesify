@@ -17,7 +17,8 @@
     "cordova-plugin-sms": "^1.0.5",
     "cordova-plugin-statusbar": "^4.0.0",
     "cordova-plugin-vibration": "^3.1.1",
-    "cordova-plugin-x-toast": "^2.7.3"
+    "cordova-plugin-x-toast": "^2.7.3",
+    "cordova-support-android-plugin": "~2.0.4"
   },
   "cordova": {
     "platforms": [

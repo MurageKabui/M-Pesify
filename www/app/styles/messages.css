@@ -1,5 +1,4 @@
-/* Messages Component Styles */
-
+﻿/* Messages Component Styles */
 .messages-area {
     flex: 1;
     overflow-y: auto;
@@ -141,6 +140,7 @@
     .message-item.incoming .bubble {
         background: #303030;
         color: #e8eaed;
+        font-size: 15px;
     }
 
     .message-item.outgoing .bubble {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "761457937360",
+    "project_id": "mpesify",
+    "storage_bucket": "mpesify.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:761457937360:android:c7c40ae3fc615f24b347d5",
+        "android_client_info": {
+          "package_name": "com.mpesify.denniskabui"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6V57yKYGA1cofZEtnMtNzlc1mRc-18vM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

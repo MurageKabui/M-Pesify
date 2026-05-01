@@ -1,4 +1,4 @@
-/* Lock Screen Styles */
+﻿/* Lock Screen Styles */
 .lock-container {
     display: flex;
     align-items: center;
@@ -16,12 +16,16 @@
 
 .lock-icon {
     margin-bottom: 32px;
+    background-color: #333;
+    display: inline-block;
+    border-radius: 50%;
+    padding: 20px;
 }
 
-.lock-icon i {
-    font-size: 80px;
-    color: #5f6368;
-    opacity: 0.85;
+.lock-icon img {
+    background: transparent;
+    width: 100px;
+    height: 100px;
 }
 
 .lock-header {
@@ -150,6 +154,10 @@
 
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
+    .lock-icon {
+        background-color: #555;
+    }
+
     .lock-icon i {
         color: #9aa0a6;
     }
@@ -199,6 +207,10 @@
 @media (max-width: 480px) {
     .lock-icon i {
         font-size: 64px;
+    }
+
+    .lock-icon {
+        padding: 15px;
     }
 
     .lock-title {

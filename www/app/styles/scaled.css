@@ -2,7 +2,7 @@
 /*!
 This file is part of DecSoft App Builder.
 Visit our website for license information.
-Copyright ©2025 DecSoft. All rights reserved.
+Copyright ©2026 DecSoft. All rights reserved.
 Visit our website at: https://www.decsoftutils.com/
 
 */
@@ -18,5 +18,4 @@ html, body { width: 320px; height: 480px; }
 #viewMMsgsList #htmlToolbar { position: absolute; top: 0.00%; left: 0.00%; width: 100.00%; height: 6.67%; }
 
 #viewSettings #settingsList { position: absolute; top: 6.67%; left: 2.50%; width: 95.00%; height: 93.33%; }
-
 #viewSettings #htmlToolbarSettings { position: absolute; top: 0.00%; left: 0.00%; width: 100.00%; height: 6.67%; }

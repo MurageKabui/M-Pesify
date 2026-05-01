@@ -45,10 +45,13 @@
     }
   },
   "dependent_plugins": {
+    "cordova-plugin-badge-fix": {
+      "PACKAGE_NAME": "com.mpesify.denniskabui"
+    },
     "cordova-plugin-device": {
       "PACKAGE_NAME": "com.mpesify.denniskabui"
     },
-    "cordova-plugin-badge-fix": {
+    "cordova-support-android-plugin": {
       "PACKAGE_NAME": "com.mpesify.denniskabui"
     }
   }

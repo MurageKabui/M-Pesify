@@ -1,0 +1,27 @@
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+xmlns:android="http://schemas.android.com/apk/res/android"
+           id="cordova-support-android-plugin"
+      version="2.0.4">
+
+    <name>cordova-support-android-plugin</name>
+    <description>More convenient base CordovaPlugin class</description>
+    <license>MIT</license>
+    <keywords>cordova</keywords>
+    <repo>https://github.com/chemerisuk/cordova-support-android-plugin</repo>
+    <issue>https://github.com/chemerisuk/cordova-support-android-plugin/issues</issue>
+
+    <engines>
+        <engine name="cordova" version=">=7.0.0"/>
+        <engine name="cordova-android" version=">=10.0.0"/>
+    </engines>
+
+    <platform name="android">
+        <source-file src="src/android/ReflectiveCordovaPlugin.java"
+            target-dir="src/by/chemerisuk/cordova/support" />
+        <source-file src="src/android/CordovaMethod.java"
+            target-dir="src/by/chemerisuk/cordova/support" />
+        <source-file src="src/android/ExecutionThread.java"
+            target-dir="src/by/chemerisuk/cordova/support" />
+    </platform>
+
+</plugin>

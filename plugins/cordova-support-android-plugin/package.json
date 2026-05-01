@@ -1,0 +1,31 @@
+{
+  "name": "cordova-support-android-plugin",
+  "version": "2.0.4",
+  "description": "More convenient base CordovaPlugin class",
+  "cordova": {
+    "id": "cordova-support-android-plugin",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chemerisuk/cordova-support-android-plugin.git"
+  },
+  "author": "Maksim Chemerisuk <chemerisuk@gmail.com> (https://github.com/chemerisuk)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chemerisuk/cordova-support-android-plugin/issues"
+  },
+  "homepage": "https://github.com/chemerisuk/cordova-support-android-plugin#readme",
+  "keywords": [
+    "cordova",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "scripts": {
+    "version": "perl -i -pe 's/(version=)\"\\d+\\.\\d+\\.\\d+\"/$1\"'$npm_package_version'\"$2/' plugin.xml && git add plugin.xml README.md",
+    "postversion": "git push && git push --tags"
+  }
+}
