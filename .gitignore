@@ -6,3 +6,4 @@ cordova_android_release.bat
 cordova_android_run.bat
 cordova_android_simulate.bat
 auto_git_push.bat
+other.txt
