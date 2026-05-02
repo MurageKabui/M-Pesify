@@ -1,4 +1,0 @@
-adb shell setprop debug.firebase.analytics.app com.mpesify.denniskabui
-
-<preference name="ANDROID_FIREBASE_BOM_VERSION" default="32.5.0" />
-      <resource-file src="google-services.json" target="app/google-services.json" />
